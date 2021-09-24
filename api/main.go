@@ -1,7 +1,7 @@
 package main
 
-import "log"
+import "api/app"
 
 func main() {
-	log.Println("Start App...")
+	app.StartApp()
 }
