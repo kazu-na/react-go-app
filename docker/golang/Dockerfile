@@ -1,11 +1,8 @@
-FROM golang:1.17.1-alpine3.14
+FROM golang:1.17.1-buster
 
 # Goビルドに必要なアプリケーションをインストールする
-RUN apk update \
-    && apk add --no-cache git \
-    && go get github.com/gin-gonic/gin \
-    && go get github.com/cosmtrek/air \
-    && go build -o /go/bin/air github.com/cosmtrek/air \
+RUN go get -u github.com/gin-gonic/gin \
+    && go install github.com/cosmtrek/air@latest \
     && go get github.com/gorilla/mux \
     && go get github.com/jinzhu/gorm \
     && go get github.com/go-sql-driver/mysql \
@@ -18,10 +15,10 @@ WORKDIR /go/src/api
 
 # go moduleで依存パッケージを取得してダウンロードする
 # ローカルの、go.modとgo.sumをコピー
-COPY go.mod go.sum ./
+COPY api/go.mod api/go.sum ./
 # 依存ライブラリをダウンロードする
 RUN go mod download
 
-COPY ./api /go/src/api
+COPY ./api .
 
 CMD ["air", "-c", ".air.toml"]
