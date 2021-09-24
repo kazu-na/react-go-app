@@ -50,4 +50,3 @@ services:
       - db
     env_file:
       - docker/mysql/settings.env
-
