@@ -1,0 +1,53 @@
+version: '3'
+services:
+  web:
+    container_name: react
+    build:
+      context: .
+      dockerfile: ./docker/node/Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - api
+    volumes:
+      - ./react-app:/app/react
+    command: sh -c "cd react-app && yarn start"
+    tty: true
+
+  api:
+    container_name: go
+    build:
+      context: .
+      dockerfile: ./docker/golang/Dockerfile
+    ports:
+      - 8080:80
+    depends_on:
+      - db
+    volumes:
+      - ./api:/go/src/api
+    env_file:
+      - docker/mysql/settings.env
+    tty: true
+
+  db:
+    container_name: mysql
+    image: mysql:5.7
+    ports:
+      - 3306:3306
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/sql:/docker-entrypoint-initdb.d
+    env_file:
+      - docker/mysql/settings.env
+
+  phpmyadmin:
+    container_name: phpMyAdmin
+    image: phpmyadmin:5.1-apache
+    ports:
+      - 9080:80
+    depends_on:
+      - db
+    env_file:
+      - docker/mysql/settings.env
+
